@@ -1,13 +1,18 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 import json
 from product.models import Product
 from django.forms.models import model_to_dict
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from product.serializers import ProductSerializer
 
 
+@api_view(['POST'])
 def api_home(request):
-    model_data = Product.objects.all().order_by("?").first()
-    data = {}
-    if model_data:
-        data = model_to_dict(model_data, fields=['id', 'title'])
 
-    return JsonResponse(data)
+    serializer = ProductSerializer(data=request.data)
+    if serializer.is_valid():
+        data = serializer.save()
+        print(data)
+        return Response(serializer.data)
+
